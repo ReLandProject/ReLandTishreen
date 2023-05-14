@@ -1,0 +1,4 @@
+name,coverage,spatial_res,img_num_unfiltered,img_num_chosen
+Landsat5,1999-2011,30,107,-
+Landsat8,2013-2017,30,51,-
+Sentinel2,2018-2023,20,64,-
