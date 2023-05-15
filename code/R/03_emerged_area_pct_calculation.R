@@ -164,7 +164,7 @@ writeOGR(
   driver = "ESRI Shapefile", overwrite_layer = TRUE
 )
 
-write.csv(tshr_polys@data, here::here("output/csv", "tshr_polys_area_pct_min.csv"))
+write.csv(tshr_polys@data, here::here("output/csv", "tshr_polys_area_pct_min.csv"), row.names = FALSE)
 
 
 
@@ -185,6 +185,6 @@ writeOGR(
   driver = "ESRI Shapefile", overwrite_layer = TRUE
 )
 
-write.csv(tshr_polys@data, here::here("output/csv", "tshr_polys_area_pct_max.csv"))
+write.csv(tshr_polys@data, here::here("output/csv", "tshr_polys_area_pct_max.csv"), row.names = FALSE)
 
 # column_names <- colnames(tshr_polys@data[1:7]) # save it for later

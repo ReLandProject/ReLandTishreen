@@ -76,11 +76,13 @@ names_sites <- tshr_polys_pct_info_max@data[which(tshr_polys_pct_info_max@data$A
 
 tshr_polys_pct_info_max@data  <- tshr_polys_pct_info_max@data %>% 
   mutate(NeverSub = ifelse(AlwaysEm == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0)) %>% 
-  mutate(NeverEm = ifelse(AlwaysSub == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0))
+  mutate(NeverEm = ifelse(AlwaysSub == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0)) %>% 
+  mutate(across(starts_with("Never"), as.integer))
 
 tshr_polys_pct_info_min@data  <- tshr_polys_pct_info_min@data %>% 
   mutate(NeverSub = ifelse(AlwaysEm == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0)) %>% 
-  mutate(NeverEm = ifelse(AlwaysSub == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0))
+  mutate(NeverEm = ifelse(AlwaysSub == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0)) %>% 
+  mutate(across(starts_with("Never"), as.integer))
 
 # Get some insights into the data just created
 # Note: Fields AlwaysEm and AlwaysSub are relative to the water level period
@@ -114,7 +116,7 @@ writeOGR(
   driver = "ESRI Shapefile", overwrite_layer = TRUE
 )
 
-write.csv(tshr_polys_pct_info_min@data, here::here("output/csv", "tshr_polys_area_pct_info_min.csv"))
+write.csv(tshr_polys_pct_info_min@data, here::here("output/csv", "tshr_polys_area_pct_info_min.csv"), row.names = FALSE)
 
 writeOGR(
   obj = tshr_polys_pct_info_max,
@@ -123,7 +125,7 @@ writeOGR(
   driver = "ESRI Shapefile", overwrite_layer = TRUE
 )
 
-write.csv(tshr_polys_pct_info_max@data, here::here("output/csv", "tshr_polys_area_pct_info_max.csv"))
+write.csv(tshr_polys_pct_info_max@data, here::here("output/csv", "tshr_polys_area_pct_info_max.csv"), row.names = FALSE)
 
 
 # Obtain point layers and export them instead of creating centroids later
