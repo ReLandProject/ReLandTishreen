@@ -149,23 +149,24 @@ get_emersion_data <- function(a, column_index) {
   
   if (is(aa, "sf")) { # check wether we need to account for the geometry column added by the sf format
     tot_cols <- length(aa) -1 # -1 to account for the geometry column that can't be easily removed
-    NeverAff_threshold <- (ncol(select(aa, ends_with("_em"))) -1) * 100 # The threshold for calculating the NeverAff field is equal to the number of years multiplied by 100 (the pct of emerged area)
+    AlwaysEm_threshold <- (ncol(select(aa, ends_with("_em"))) -1) * 100 # The threshold for calculating the AlwaysEm field is equal to the number of years multiplied by 100 (the pct of emerged area)
     
   } else {
     tot_cols <- length(aa) # -1 to account for the geometry column that can't be easily removed
-    NeverAff_threshold <- (ncol(select(aa, ends_with("_em")))) * 100 # The threshold for calculating the NeverAff field is equal to the number of years multiplied by 100 (the pct of emerged area)
+    AlwaysEm_threshold <- (ncol(select(aa, ends_with("_em")))) * 100 # The threshold for calculating the AlwaysEm field is equal to the number of years multiplied by 100 (the pct of emerged area)
   }
 
-  aa$NeverAff <- ifelse(rowSums(aa[, column_index:tot_cols, drop = TRUE], na.rm = TRUE) >= NeverAff_threshold, 1, 0)
-  aa$ComplSub <- ifelse(aa$NeverAff == 0 & rowSums(aa[, column_index:tot_cols, drop = TRUE], na.rm = TRUE) == 0, 1, 0)
+  aa$AlwaysEm <- ifelse(rowSums(aa[, column_index:tot_cols, drop = TRUE], na.rm = TRUE) >= AlwaysEm_threshold, 1, 0)
+  aa$AlwaysSub <- ifelse(aa$AlwaysEm == 0 & rowSums(aa[, column_index:tot_cols, drop = TRUE], na.rm = TRUE) == 0, 1, 0)
+  aa$Affected  <- ifelse(aa$AlwaysEm == 1 | aa$AlwaysSub == 1, 0, 1)
 
-  aa <- aa %>%
-    mutate(Area100 = ifelse(NeverAff == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x == 100)), 1, 0)) %>%
-    mutate(Area75 = ifelse(NeverAff == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x >= 75)), 1, 0)) %>%
-    mutate(Area50 = ifelse(NeverAff == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x >= 50)), 1, 0)) %>%
-    mutate(Area25 = ifelse(NeverAff == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x >= 25)), 1, 0)) %>%
-    mutate(AreaLt25 = ifelse(NeverAff == 0 & ComplSub == 0 & Area100 == 0 &
-      Area75 == 0 & Area50 == 0 & Area25 == 0, 1, 0))
+  # aa <- aa %>%
+  #   mutate(Area100 = ifelse(AlwaysEm == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x == 100)), 1, 0)) %>%
+  #   mutate(Area75 = ifelse(AlwaysEm == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x >= 75)), 1, 0)) %>%
+  #   mutate(Area50 = ifelse(AlwaysEm == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x >= 50)), 1, 0)) %>%
+  #   mutate(Area25 = ifelse(AlwaysEm == 0 & rowAny(across(column_index:all_of(tot_cols), ~ .x >= 25)), 1, 0)) %>%
+  #   mutate(AreaLt25 = ifelse(AlwaysEm == 0 & ComplSub == 0 & Area100 == 0 &
+  #     Area75 == 0 & Area50 == 0 & Area25 == 0, 1, 0))
 
   print(aa)
 }

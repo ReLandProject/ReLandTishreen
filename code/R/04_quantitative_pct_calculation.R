@@ -1,11 +1,11 @@
 # remotes::install_github("paleolimbot/qgisprocess")
 # library(qgisprocess)
 # library(raster)
-library(tidyverse)
+library(dplyr)
 # library(janitor)
 # library(foreign)
 library(magrittr)
-# library(rgdal)
+library(rgdal)
 library(here)
 library(sf)
 library(sp)
@@ -26,6 +26,11 @@ tshr_polys_pct_min <- readOGR(here::here("output/shp", "tshr_polys_area_pct_min.
 
 tshr_polys_pct_max <- readOGR(here::here("output/shp", "tshr_polys_area_pct_max.shp"),
                               stringsAsFactors = FALSE, verbose = TRUE
+)
+
+# Load also the points to export a point layer later
+tshr_sites <- readOGR(here::here("data/raw/shp", "Tishreen_Points.shp"),
+                      stringsAsFactors = FALSE, verbose = FALSE
 )
 
 # Apply the function after converting to simple feature, then convert it back to spatial object
@@ -61,20 +66,44 @@ tshr_polys_pct_info_max@data <- tshr_polys_pct_info_max@data %>%
   set_colnames(sub("X", "", colnames(.), fixed = TRUE))
 
 
-# Get info on never aff and always sub sites
+# Evaluate whether the three operations below should go inside the function -----------------------------------------------------------------------
+# Get info on NeverEm and AlwaysSub sites
 # Isolate sites which are not touched by the lake in periods of max water
-# and those that are not outside of the water in periods of min water
-names_sites <- tshr_polys_pct_info_max@data[which(tshr_polys_pct_info_max@data$NeverAff == 1),] %>% 
-  bind_rows(tshr_polys_pct_info_min@data[which(tshr_polys_pct_info_min$ComplSub == 1),]) %>% 
+# and those that are not outside the water in periods of min water
+names_sites <- tshr_polys_pct_info_max@data[which(tshr_polys_pct_info_max@data$AlwaysEm == 1),] %>% 
+  bind_rows(tshr_polys_pct_info_min@data[which(tshr_polys_pct_info_min$AlwaysSub == 1),]) %>% 
   select(starts_with("Name"))
 
 tshr_polys_pct_info_max@data  <- tshr_polys_pct_info_max@data %>% 
-  mutate(NeverSub = ifelse(NeverAff == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0)) %>% 
-  mutate(NeverEm = ifelse(ComplSub == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0))
+  mutate(NeverSub = ifelse(AlwaysEm == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0)) %>% 
+  mutate(NeverEm = ifelse(AlwaysSub == 1 & tshr_polys_pct_info_max@data$Name %in% names_sites$Name, 1, 0))
 
 tshr_polys_pct_info_min@data  <- tshr_polys_pct_info_min@data %>% 
-  mutate(NeverSub = ifelse(NeverAff == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0)) %>% 
-  mutate(NeverEm = ifelse(ComplSub == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0))
+  mutate(NeverSub = ifelse(AlwaysEm == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0)) %>% 
+  mutate(NeverEm = ifelse(AlwaysSub == 1 & tshr_polys_pct_info_min@data$Name %in% names_sites$Name, 1, 0))
+
+# Get some insights into the data just created
+# Note: Fields AlwaysEm and AlwaysSub are relative to the water level period
+# Fields NeverSub and NeverEm are independent of the water level
+# This means that NeverSub and NeverEm should be the same in both layers
+# For the same reason, AlwaysEm and NeverSub will be the same in max water level
+# And AlwaysSub and NeverEm will be the same in min water level
+
+# First let's check if NeverSub and NeverEm are  the same in min and max water level
+length(which(tshr_polys_pct_info_min@data$NeverSub == 1)) == length(which(tshr_polys_pct_info_max@data$NeverSub == 1))
+length(which(tshr_polys_pct_info_min@data$NeverEm == 1)) == length(which(tshr_polys_pct_info_max@data$NeverEm == 1))
+
+# Print a table in the console
+knitr::kable(data.frame(
+  "Always Submerged at h.w.l." = length(which(tshr_polys_pct_info_max@data$AlwaysSub == 1)),
+  "Always Emerged at h.w.l." = length(which(tshr_polys_pct_info_max@data$AlwaysEm == 1)),
+  "Always Submerged at l.w.l." = length(which(tshr_polys_pct_info_min@data$AlwaysSub == 1)),
+  "Always Emerged at l.w.l." = length(which(tshr_polys_pct_info_min@data$AlwaysEm == 1)),
+  "Never Emerged" = length(which(tshr_polys_pct_info_min@data$NeverEm == 1)),
+  "Never Submerged" = length(which(tshr_polys_pct_info_min@data$NeverSub == 1)),
+  "Affected in h.w.l." = length(which(tshr_polys_pct_info_max@data$Affected == 1)),
+  "Affected in l.w.l." = length(which(tshr_polys_pct_info_min@data$Affected == 1))
+))
 
 # Export data
 
@@ -97,6 +126,26 @@ writeOGR(
 write.csv(tshr_polys_pct_info_max@data, here::here("output/csv", "tshr_polys_area_pct_info_max.csv"))
 
 
+# Obtain point layers and export them instead of creating centroids later
+tshr_points_pct_info_min <- tshr_sites
+tshr_points_pct_info_max <- tshr_sites
+
+tshr_points_pct_info_min@data <- tshr_polys_pct_info_min@data
+tshr_points_pct_info_max@data <- tshr_polys_pct_info_max@data
+
+writeOGR(
+  obj = tshr_points_pct_info_min,
+  dsn = here::here("output/shp", "tshr_points_pct_info_min.shp"),
+  layer = "tshr_points_pct_info_min",
+  driver = "ESRI Shapefile", overwrite_layer = TRUE
+)
+
+writeOGR(
+  obj = tshr_points_pct_info_max,
+  dsn = here::here("output/shp", "tshr_points_pct_info_max.shp"),
+  layer = "tshr_points_pct_info_max",
+  driver = "ESRI Shapefile", overwrite_layer = TRUE
+)
 
 
 
