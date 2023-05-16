@@ -49,21 +49,25 @@ starting_col <- length(fields_to_select) +1
 
 tshr_polys_pct_info_min <- st_as_sf(tshr_polys_pct_min) %>%
   get_emersion_data(column_index = starting_col) %>%
-  as(., "Spatial")
+  mutate(across(where(is.numeric), as.integer))
 
+tshr_polys_pct_info_min <- tshr_polys_pct_info_min[order(tshr_polys_pct_info_min$Name),] %>% 
+as(., "Spatial")
 
 tshr_polys_pct_info_min@data <- tshr_polys_pct_info_min@data %>% 
-  mutate(across(where(is.numeric), as.integer)) %>% 
   set_colnames(sub("X", "", colnames(.), fixed = TRUE))
 
 
 tshr_polys_pct_info_max <- st_as_sf(tshr_polys_pct_max) %>%
   get_emersion_data(column_index = starting_col) %>%
-  as(., "Spatial")
+  mutate(across(where(is.numeric), as.integer))
+  
+tshr_polys_pct_info_max <- tshr_polys_pct_info_max[order(tshr_polys_pct_info_max$Name),] %>% 
+as(., "Spatial")
 
 tshr_polys_pct_info_max@data <- tshr_polys_pct_info_max@data %>% 
-  mutate(across(where(is.numeric), as.integer)) %>% 
   set_colnames(sub("X", "", colnames(.), fixed = TRUE))
+  
 
 
 # Evaluate whether the three operations below should go inside the function -----------------------------------------------------------------------
@@ -129,8 +133,14 @@ write.csv(tshr_polys_pct_info_max@data, here::here("output/csv", "tshr_polys_are
 
 
 # Obtain point layers and export them instead of creating centroids later
-tshr_points_pct_info_min <- tshr_sites
-tshr_points_pct_info_max <- tshr_sites
+
+
+tshr_sites_sf <- st_as_sf(tshr_sites)
+
+tshr_sites_sp <- tshr_sites_sf[order(tshr_sites_sf$Name),] %>% as(., "Spatial")
+
+tshr_points_pct_info_min <- tshr_sites_sp
+tshr_points_pct_info_max <- tshr_sites_sp
 
 tshr_points_pct_info_min@data <- tshr_polys_pct_info_min@data
 tshr_points_pct_info_max@data <- tshr_polys_pct_info_max@data
