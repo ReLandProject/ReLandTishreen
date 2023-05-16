@@ -170,21 +170,25 @@ add_row(Years = last(split_df$MinWaterLevel$Years), Period = "MinWaterLevel", Wa
 
 
 
-dahiti <- TRUE
-# dahiti <- FALSE
+# dahiti <- TRUE
+dahiti <- FALSE
 
 if (dahiti) {
     water_info <- split_dahiti_df
     max_aes <- aes(Years, WaterLevel, colour = "#F8776D", group = 1)
     min_aes <- aes(Years, WaterLevel, colour = "#00C0B8", group = 1)
     labels <- labs(y = "Reservoir Water Level (m - s.l.m. Approx.)")
-    filename = "number_of_polygons_per_year_water_level_comb.png"
+    filename <- "number_of_polygons_per_year_water_level_comb.png"
+    title <- "Tishreen Dam Water Surface and Number of Emerged Sites Polygons (2000-2023)"
+    caption <- "Water Level Data: Database for Hydrological Time Series of Inland Waters (DAHITI)"
 } else {
     water_info <- split_df
     max_aes <- aes(Years, WaterSurface, colour = "#F8776D", group = 1)
     min_aes <- aes(Years, WaterSurface, colour = "#00C0B8", group = 1)
     labels <- labs(y = "Reservoir Water Area (sqkm - Approx.)")
-    filename = "number_of_polygons_per_year_water_area_comb.png"
+    filename <- "number_of_polygons_per_year_water_area_comb.png"
+    title <- "Tishreen Dam Water Level and Number of Emerged Sites Polygons (2000-2023)"
+    caption <- "Water Surface Data: Vectorized Reclassified Rasters"
 }
 
 water_level_plot <- ggplot() +
@@ -207,8 +211,8 @@ water_level_plot
 patch <- water_level_plot / polys_pct_time_series_plot_min_all +
   plot_annotation(
     tag_levels = "A",
-    title = "Mosul Dam Water Level and Number of Emerged Sites Polygons (1993-2020)",
-    caption = "Water Level Data: Database for Hydrological Time Series of Inland Waters (DAHITI)"
+    title = title,
+    caption = caption
   ) &
   theme(
     plot.title = element_text(size = 14),
@@ -287,7 +291,7 @@ custom_levels <- c("Tell Banat - Area: 2 ha",
 
 pct_area_min_max_plot <- ggplot(sites_pct_area_min_max_long, aes(x = Years, y = PctEmergedArea, fill = Period)) +
   geom_bar(width = 0.8, stat = "identity", position = "dodge", alpha = .8) +
-  geom_hline(yintercept = c(25, 50, 75), linetype = "dashed", size = 0.5, color = "#40404077") +
+  geom_hline(yintercept = c(25, 50, 75), linetype = "dashed", size = 0.5, color = "#4040401e") +
   scale_fill_manual(values = c("grey26", "grey65"))+
   facet_wrap(~ label, scales = "fixed", ncol = 2) +
   theme_light() +
@@ -306,7 +310,6 @@ pct_area_min_max_plot <- ggplot(sites_pct_area_min_max_long, aes(x = Years, y = 
   guides(x = guide_axis(angle = 60))
 
 pct_area_min_max_plot
-
 
 # prev width 380
 ggsave(
