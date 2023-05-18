@@ -65,9 +65,8 @@ tshr_polys_pct_info_max <- st_as_sf(tshr_polys_pct_max) %>%
 tshr_polys_pct_info_max <- tshr_polys_pct_info_max[order(tshr_polys_pct_info_max$Name),] %>% 
 as(., "Spatial")
 
-tshr_polys_pct_info_max@data <- tshr_polys_pct_info_max@data %>% 
+tshr_polys_pct_info_max@data <- tshr_polys_pct_info_max@data %>%
   set_colnames(sub("X", "", colnames(.), fixed = TRUE))
-  
 
 
 # Evaluate whether the three operations below should go inside the function -----------------------------------------------------------------------

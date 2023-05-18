@@ -292,7 +292,8 @@ custom_levels <- c("Tell Banat - Area: 2 ha",
 pct_area_min_max_plot <- ggplot(sites_pct_area_min_max_long, aes(x = Years, y = PctEmergedArea, fill = Period)) +
   geom_bar(width = 0.8, stat = "identity", position = "dodge", alpha = .8) +
   geom_hline(yintercept = c(25, 50, 75), linetype = "dashed", size = 0.5, color = "#4040401e") +
-  scale_fill_manual(values = c("grey26", "grey65"))+
+  scale_colour_identity(name = 'Period', guide = 'legend', labels = c("MinWaterLevel","MaxWaterLevel"))+
+  # scale_fill_manual(values = c("grey26", "grey65"))+
   facet_wrap(~ label, scales = "fixed", ncol = 2) +
   theme_light() +
   labs(
