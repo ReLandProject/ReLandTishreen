@@ -106,14 +106,14 @@ dahiti_df <- data.frame(
 )
 
 get_timeseries_pct_numsites_all <- function(y, Period, WaterSurface) {
-  y %>%
+  a <- y %>%
     summarise(across(ends_with("_em"), list(sum = ~ sum(.x > 0, na.rm = T)))) %>%
     pivot_longer(everything(), names_to = "Years", values_to = "NumPolys") %>%
     mutate(Years = str_remove(Years, "_em_sum")) %>%
     mutate(Years = str_replace(Years, "_", "-")) %>% 
     mutate(Period = Period) %>% 
-    cbind(., WaterSurface = WaterSurface) -> a
-  
+    cbind(., WaterSurface = WaterSurface)
+
   print(a)
 }
 
