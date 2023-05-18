@@ -51,7 +51,7 @@ img_crs = "EPSG: 32637"
 
 start  <- ee$Date$fromYMD(2020, 01, 01)
 
-end <- ee$List$sequence(0, 35)
+end <- ee$List$sequence(0, 1)
 
 # Choose which method to use for exporting the images (DRIVE, LOCAL)
 # see https://r-spatial.github.io/rgee/reference/ee_imagecollection_to_local.html#details
@@ -75,8 +75,12 @@ limit_num <- 5
 # This may be slower depending on the number of images
 display <- TRUE
 
+if (composite == "NDWI") {
+   area <- ee$String("tshr_NDWI_")
+} else if (composite == "RGB") {
+   area <- ee$String("tshr_RBGA_")
+}
 
-area <- ee$String("tshr_NDWI_")
 
 # Generate geometries according to the chosen area
 # Generate also a string useful in naming the images later
