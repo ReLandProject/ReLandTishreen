@@ -110,3 +110,6 @@ gdalwmscache/
 
 # Avoid all the temporary GIS files and prefer a final, separate repo for the data (preferrably versioned with Kart)
 /data/gis
+
+# Avoid the workflow script for now
+workflow.R
