@@ -49,6 +49,8 @@ img_crs = "EPSG: 32637"
   # - L8: 2013-present
   # - S2: 2015-present
 
+# The start variable set the starting point and the end variable determine how much
+# the function needs to advance from the start variable.
 start  <- ee$Date$fromYMD(2020, 01, 01)
 
 end <- ee$List$sequence(0, 1)
@@ -104,45 +106,40 @@ study_region <- geometry_tishreen
 # a string identifying the satellite (useful in the image naming later)
 # and start and end dates (unique to each satellite).
 # Please refer to https://www.usgs.gov/media/images/landsat-missions-timeline
-# for information on periods of activity and decommision of each satellite.
-# The start variable set the starting point and the end variable determine how much
-# the function needs to advance from the start variable.
+# for information on periods of activity and decommission of each satellite.
 
 if (satellite == "L5") {
 
     BaseColl <- ee$ImageCollection("LANDSAT/LT05/C01/T1_SR")
-    
-    # ndwi_bands <- c("B2", "B5")
+
     green  <- "B2"
     swir <- "B5"
     rgb_bands <- c("B3", "B2", "B1")
-    
+
     sensor <- ee$String("_L5")
 
     px_scale <- 30
-  
+
 } else if (satellite == "L7") {
-  
+
     BaseColl <- ee$ImageCollection("LANDSAT/LE07/C01/T1_SR")
-    
-    # ndwi_bands <- c("B2", "B5")
+
     green  <- "B2"
     swir <- "B5"
     rgb_bands <- c("B3", "B2", "B1")
-    
+
     sensor <- ee$String("_L7")
 
     px_scale <- 30
 
 } else if (satellite == "L8") {
-   
+
     BaseColl <- ee$ImageCollection("LANDSAT/LC08/C01/T1_SR")
-    
-    # ndwi_bands <- c("B2", "B11")
+
     green  <- "B3"
     swir <- "B6"
     rgb_bands <- c("B4", "B3", "B2")
-    
+
     sensor <- ee$String("_L8")
 
     px_scale <- 30
@@ -159,7 +156,6 @@ if (satellite == "L5") {
 
     BaseColl <- ee$ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
 
-    # ndwi_bands <- c("B3", "B11")
     green  <- "B3"
     swir <- "B11"
     rgb_bands <- c("B4", "B3", "B2")
