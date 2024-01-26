@@ -1,0 +1,35 @@
+ErrMatrixCode	Reference	Classified	PixelSum
+1	1	1	167
+3	1	2	2
+2	2	1	1
+4	2	2	69
+
+	> ERROR MATRIX (pixel count)
+	> Reference
+V_Classified	1	2	Total
+1	167	1	168
+2	2	69	71
+Total	169	70	239
+
+	> AREA BASED ERROR MATRIX
+	> Reference
+V_Classified	1	2	Area	Wi
+1	0.9044	0.0054	1684541700.0000	0.9098
+2	0.0025	0.0877	166996800.0000	0.0902
+Total	0.9069 	0.0931 	1851538500.0000 
+Area	1679218801	172319699	1851538500
+SE	0.0057	0.0057
+SE area	10556884	10556884
+95% CI area	20691492	20691492
+PA  [%]	99.7199	94.1811
+UA  [%]	99.4048	97.1831
+Kappa hat	0.9360	0.9689
+
+Overall accuracy [%] = 99.2044
+Kappa hat classification = 0.9522
+
+Area unit = metre^2
+SE = standard error
+CI = confidence interval
+PA = producer's accuracy
+UA = user's accuracy
