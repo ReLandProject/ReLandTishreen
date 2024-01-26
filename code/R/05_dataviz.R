@@ -229,8 +229,6 @@ ggsave(
 
 # Selected sites plot -----------------------------------------------------------------------
 
-sites_to_plot
-
 # Min Water Level
 
 sites_pct_area_min_filtered <- tshr_polys_pct_info_min_filtered %>% 
@@ -293,7 +291,8 @@ pct_area_min_max_plot <- ggplot(sites_pct_area_min_max_long, aes(x = Years, y = 
   geom_bar(width = 0.8, stat = "identity", position = "dodge", alpha = .8) +
   geom_hline(yintercept = c(25, 50, 75), linetype = "dashed", size = 0.5, color = "#4040401e") +
   scale_colour_identity(name = 'Period', guide = 'legend', labels = c("MinWaterLevel","MaxWaterLevel"))+
-  # scale_fill_manual(values = c("grey26", "grey65"))+
+  scale_y_continuous(limits = c(0,100), breaks = c(0, 25, 50, 75, 100)) + # Enforce same scale on the plots  
+  scale_fill_manual(values = c("grey26", "grey65"))+
   facet_wrap(~ label, scales = "fixed", ncol = 2) +
   theme_light() +
   labs(
@@ -318,3 +317,89 @@ ggsave(
   path = here::here("output/plots"),
   device = "png", width = 240, height = 160, units = "mm", dpi = 300
 )
+
+# Tables -----------------------------------------------------------------------
+
+# Number of site per category per site type
+poly_quant_data <- data.frame(
+  "PolygonStatus" = factor(c("Always Submerged at h.w.l.", "Affected", "Always Exposed at l.w.l.", "Never Exposed", "Never Submerged"),
+                           levels = c("Always Submerged at h.w.l.", "Affected", "Always Exposed at l.w.l.",  "Never Exposed", "Never Submerged"),
+                           ordered = TRUE
+  ),
+  "MinWaterLevel" = colSums(tshr_polys_pct_info_min[, c("AlwaysSub", "Affected", "AlwaysEm","NeverEm", "NeverSub")]),
+  "MaxWaterLevel" = colSums(tshr_polys_pct_info_max[, c("AlwaysSub", "Affected", "AlwaysEm","NeverEm", "NeverSub")]),
+  row.names = NULL
+)
+
+# Subtract the values of the NeverEm and NeverSub sites from the ComplSub and NeverAff columns
+poly_quant_data[1,2:3] <- poly_quant_data[1,2:3] - 18
+poly_quant_data[3,2:3] <- poly_quant_data[3,2:3] - 16
+
+# Isolate the site always sub in the max water level and set its value of Affected as 1
+always_sub_index <- which(tshr_polys_pct_info_max$AlwaysSub == 1 & tshr_polys_pct_info_max$NeverEm != 1)
+
+tshr_polys_pct_info_max[always_sub_index, "Affected"] <- 1
+
+tshr_polys_pct_info_max[always_sub_index, "AlwaysSub"] <- 0
+
+ site_type_quant <- tshr_polys_pct_info_max %>%
+  group_by(Type) %>%
+  summarise(
+    Affected = sum(Affected),
+    NeverEm = sum(NeverEm),
+    NeverSub = sum(NeverSub)
+  )
+
+write.csv(site_type_quant, here::here("output/csv/site_type_quant.csv"))
+
+# Plot single sites -----------------------------------------------------------------------
+
+
+# Selected sites plot -----------------------------------------------------------------------
+# Filter for Tell Ahmar and Qara Kozak
+sites_to_plot <- sites_to_plot %>% 
+filter(sites_to_plot$Name %in% c("Tell Ahmar", "Tell Qara Qozak"))
+
+custom_levels <- c(
+                   "Tell Qara Qozak - Area: 14 ha",
+                   "Tell Ahmar - Area: 71 ha")
+
+ sites_pct_area_min_max_long <- sites_pct_area_min_max_long %>% 
+ mutate(label = factor(label, levels = custom_levels, ordered = TRUE))
+
+
+sites <- split(sites_pct_area_min_max_long, sites_pct_area_min_max_long$Name)
+
+sites_plots <- list()
+
+for (i in seq_along(sites)) {
+   sites_plots[[i]] <- ggplot(sites[[i]], aes(x = Years, y = PctEmergedArea, fill = Period)) +
+    geom_bar(width = 0.8, stat = "identity", position = "dodge", alpha = .8) +
+    geom_hline(yintercept = c(25, 50, 75), linetype = "dashed", size = 0.5, color = "#4040401e") +
+    scale_colour_identity(name = 'Period', guide = 'legend', labels = c("MinWaterLevel","MaxWaterLevel"))+
+    scale_fill_manual(values = c("grey26", "grey65"))+
+    scale_y_continuous(limits = c(0,100), breaks = c(0, 25, 50, 75, 100)) + # Enforce same scale on the plots
+    facet_wrap(~ label, scales = "fixed", ncol = 2) +
+    theme_light() +
+    labs(
+      y = "Percentage of Site Area Resurfaced",
+      title = "Percentage of Site Area Resurfaced During Periods of Minimum and Maximum Water Level (2000-2023)"
+    ) +
+    theme(
+      legend.position = "bottom",
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 5), axis.title.x = element_blank(),
+      strip.text.x = element_text(size = 8, colour = "black"),
+      # text = element_text(size = 12),
+      axis.text.y = element_text(size = 12),legend.text = element_text(size = 12), 
+      plot.title = element_text(size = 12)
+    ) +
+    guides(x = guide_axis(angle = 60))
+
+  name <- unique(sites[[i]]$Name)
+
+  ggsave(
+    plot = sites_plots[[i]], filename = paste0("percentage_emerged_area_", name, ".png"),
+    path = here::here("output/plots"),
+    device = "png", width = 240, height = 160, units = "mm", dpi = 300
+  )
+}
