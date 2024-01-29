@@ -373,6 +373,7 @@ sites <- split(sites_pct_area_min_max_long, sites_pct_area_min_max_long$Name)
 sites_plots <- list()
 
 for (i in seq_along(sites)) {
+  title <- paste0("Percentage of Site Area Resurfaced at the site of ", sites[[i]]$Name, "(2000-2023)")
    sites_plots[[i]] <- ggplot(sites[[i]], aes(x = Years, y = PctEmergedArea, fill = Period)) +
     geom_bar(width = 0.8, stat = "identity", position = "dodge", alpha = .8) +
     geom_hline(yintercept = c(25, 50, 75), linetype = "dashed", size = 0.5, color = "#4040401e") +
@@ -383,7 +384,7 @@ for (i in seq_along(sites)) {
     theme_light() +
     labs(
       y = "Percentage of Site Area Resurfaced",
-      title = "Percentage of Site Area Resurfaced During Periods of Minimum and Maximum Water Level (2000-2023)"
+      title = title
     ) +
     theme(
       legend.position = "bottom",
