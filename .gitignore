@@ -1,3 +1,5 @@
+# R -----
+
 # History files
 .Rhistory
 .Rapp.history
@@ -47,3 +49,95 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+
+# VSCode -----
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+# MacOS -----
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# GIS and Raster -----
+
+*.qgz
+*.qgz.mldata
+# *.tif
+# *.tif.aux.xml
+*.tiff
+*.hgt
+*.hgt.aux.xml
+*.num
+*.swb
+gdalwmscache/
+
+# folders
+/accuracy_assessment/
+/data/gis/
+data/raw/csv/15347_water_level_altimetry.csv
+data/raw/raster/*
+!data/raw/raster/.gitkeep
+data/raw/shp/*
+!data/raw/shp/.gitkeep
+data/processed/raster/time_series_rgb_accuracy_assessment
+data/processed/csv/lake_surface_time_series_dahiti_coverage.csv
+data/processed/csv/lake_surface_time_series.csv
+output/gis_figures/*
+output/svg/*
+output/web/*
+output/csv/*
+!output/csv/.gitkeep
+!output/csv/tshr_polys_area_pct_info_max.csv
+!output/csv/tshr_polys_area_pct_info_min.csv
+output/plots/*
+!output/plots/.gitkeep
+output/shp/*
+!output/shp/.gitkeep
+!output/shp/zonal_histogram_output/
+output/shp/zonal_histogram_output/*
+!output/shp/zonal_histogram_output/.gitkeep
+
+# Files
+code/R/functions/dummy.R
+code/R/01_1_RGEE_image_collection.R
+.lintr
+*.code-workspace
+.gitignore
+S2_L2A_20240418.tif
